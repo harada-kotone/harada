@@ -1,11 +1,11 @@
 <!--
 ページ読込直後はglbモデル非表示。
 クリック・タップ・VRゴーグルのトリガーでstartExperienceイベント発生＆BGM再生。
-BGMが2秒再生されたらモデル表示・anime01（初期位置0,-0.8,-6、移動なし・繰り返し1回）。
-anime01を1回表示したらanime04（繰り返し2回・(0,-0.8,-6)→(0,-0.8,-4)へ移動・sound04再生）へ切替。
+BGMが2秒再生されたらモデル表示・anime01（初期位置0,-3.1,-40、移動なし・繰り返し1回）。
+anime01を1回表示したらanime04（繰り返し2回・(0,-1.8,-40)→(0,-1.8,-5)へ移動・sound04再生）へ切替。
 anime04を2回表示したらanime03（繰り返し1回・移動なし・sound03再生）へ切替。
 anime03を1回表示したらanime02（繰り返し1回・移動なし・sound02再生）へ切替。
-anime02を1回再生し終わったら https://seiei.ac.jp/ へ遷移。
+anime02を1回再生し終わったら ./index.html へ遷移。
 anime01は1.067秒、anime02は3.933秒、anime03は0.933秒、anime04は2.267秒。
 -->
 <!DOCTYPE html>
@@ -26,13 +26,13 @@ anime01は1.067秒、anime02は3.933秒、anime03は0.933秒、anime04は2.267�
     <a-entity
       id="myModel"
       gltf-model="./zombie.glb"
-      position="0 -0.8 -6"
+      position="0 -3.1 -40"
       scale="1.5 1.5 1.5"
       visible="false"
     ></a-entity>
     
-    <a-sky id="sky" src="R0010034.JPG" rotation="0 0 0"></a-sky>
-    <a-entity id="bgm" sound="src: url(bgm01.mp3); autoplay: false; loop: false;"></a-entity>
+    <a-sky id="sky" src="R0010034.JPG" rotation="0 195 0"></a-sky>
+    <a-entity id="bgm" sound="src: url(sound03.mp3); autoplay: false; loop: false;"></a-entity>
     <a-entity id="sound1" sound="src: url(sound01.mp3); autoplay: false; loop: true;"></a-entity>
     <a-entity id="sound2" sound="src: url(sound02.mp3); autoplay: false; loop: false;"></a-entity>
     <a-entity id="sound3" sound="src: url(sound03.mp3); autoplay: false; loop: true;"></a-entity>
@@ -50,6 +50,12 @@ anime01は1.067秒、anime02は3.933秒、anime03は0.933秒、anime04は2.267�
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const sceneEl = document.querySelector('a-scene');
+      sceneEl.addEventListener('loaded', function () {
+        console.log('A-Frameシーンが読み込まれました。VRモードに切り替えます。');
+        if (sceneEl.enterVR) {
+          sceneEl.enterVR();
+        }
+      });
       const modelEl = document.getElementById('myModel');
       const bgmEl = document.getElementById('bgm');
       const sound2El = document.getElementById('sound2');
@@ -76,7 +82,7 @@ anime01は1.067秒、anime02は3.933秒、anime03は0.933秒、anime04は2.267�
         // 2秒後にモデル表示＆anime01開始
         setTimeout(function() {
           modelEl.setAttribute('visible', true);
-          modelEl.setAttribute('position', '0 -0.8 -6');
+          modelEl.setAttribute('position', '0 -3.1 -40');
           // anime01: 移動なし、繰り返し1回
           modelEl.setAttribute('animation-mixer', {clip: 'anime01', loop: 'repeat', repetitions: 1, timeScale: 1, clampWhenFinished: false});
 
@@ -84,7 +90,7 @@ anime01は1.067秒、anime02は3.933秒、anime03は0.933秒、anime04は2.267�
           setTimeout(function () {
             // anime04へ切替（繰り返し2回、移動あり、sound04再生）
             modelEl.setAttribute('animation-mixer', {clip: 'anime04', loop: 'repeat', repetitions: 2, timeScale: 1, clampWhenFinished: false});
-            modelEl.setAttribute('animation__position', 'property: position; to: 0 -0.8 -4; dur: 2267; easing: linear; loop: false');
+            modelEl.setAttribute('animation__position', 'property: position; to: 0 -1.8 -5; dur: 4000; easing: linear; loop: false');
             sound4El.components.sound.playSound();
 
             // anime04(2.267秒)×2回 = 4.534秒後anime03へ
@@ -92,7 +98,7 @@ anime01は1.067秒、anime02は3.933秒、anime03は0.933秒、anime04は2.267�
               modelEl.removeAttribute('animation__position');
               // anime03へ切替（繰り返し1回、移動なし、sound03再生）
               modelEl.setAttribute('animation-mixer', {clip: 'anime03', loop: 'repeat', repetitions: 1, timeScale: 1, clampWhenFinished: false});
-              sound3El.components.sound.playSound();
+              //sound3El.components.sound.playSound();
 
               // anime03(0.933秒)終了後anime02へ
               setTimeout(function () {
@@ -103,13 +109,13 @@ anime01は1.067秒、anime02は3.933秒、anime03は0.933秒、anime04は2.267�
                 // anime02(3.933秒)終了後に遷移
                 setTimeout(function () {
                   sound2El.components.sound.stopSound();
-                  sound3El.components.sound.stopSound();
+                  //sound3El.components.sound.stopSound();
                   sound4El.components.sound.stopSound();
-                  window.location.href = 'https://seiei.ac.jp/';
-                }, 3933); // anime02 1回分
+                  window.location.href = '../vr13/';
+                }, 3533); // anime02 1回分
               }, 933); // anime03 1回分
             }, 2267 * 2); // anime04 2回分
-          }, 1067); // anime01 1回分
+          }, 1); // anime01 1回分
         }, 2000); // BGM2秒後
       }
     });
